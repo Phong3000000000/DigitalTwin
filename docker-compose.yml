@@ -1,0 +1,52 @@
+services:
+  # 0. Nginx Proxy - Giải quyết CORS issues
+  nginx-proxy:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    ports:
+      - "8888:8080"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - basyx-environment
+
+  # 1. MQTT Broker (Sử dụng bản 1.6 cho nhẹ và dễ kết nối)
+  mqtt-broker:
+    image: eclipse-mosquitto:1.6
+    container_name: mqtt-broker
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+
+  # 2. BaSyx Environment - All-in-One (Registry + AAS Repository + Submodel Repository + ConceptDescription)
+  # Image build từ source: basyx-java-server-sdk/Dockerfile.environment
+  basyx-environment:
+    image: basyx-environment:latest
+    container_name: basyx-environment
+    ports:
+      - "8081:8081"
+    environment:
+      - SERVER_PORT=8081
+      - SPRING_DATA_MONGODB_URI=mongodb+srv://sa:Admin%40123@cluster0.wtpp0cf.mongodb.net/DigitalTwinDB?retryWrites=true&w=majority
+      - SPRING_DATA_MONGODB_DATABASE=DigitalTwinDB
+      - SPRING_PROFILES_ACTIVE=logEvents,mongoDbStorage
+      - BASYX_CORS_ALLOWED-ORIGINS=*
+      - BASYX_CORS_ALLOWED-METHODS=GET,POST,PATCH,DELETE,PUT,OPTIONS,HEAD
+      - BASYX_CORS_ALLOWED-HEADERS=*
+
+  # 3. Web UI - Giao diện để bạn soi bản sao số
+  # Image build từ source: basyx-aas-web-ui
+  aas-gui:
+    image: basyx-aas-web-ui:local
+    container_name: aas-gui
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./aas-gui-config.json:/usr/src/app/dist/aas-gui-config.json:ro
+    environment:
+      - AAS_REPO_PATH=http://localhost:8081/shells
+      - SUBMODEL_REPO_PATH=http://localhost:8081/submodels
+      - CD_REPO_PATH=http://localhost:8081/concept-descriptions
+      - PRIMARY_COLOR=#00A651
+    depends_on:
+      - basyx-environment

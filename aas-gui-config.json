@@ -1,0 +1,6 @@
+{
+  "aasRepoPath": "http://localhost:8081/shells",
+  "submodelRepoPath": "http://localhost:8081/submodels",
+  "cdRepoPath": "http://localhost:8081/concept-descriptions",
+  "primaryColor": "#00A651"
+}
