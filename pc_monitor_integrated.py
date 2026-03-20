@@ -463,7 +463,7 @@ def collect_and_update_operational_data():
         # Hiển thị thông tin
         print(f"[{datetime.now().strftime('%H:%M:%S')}] Updated {success_count}/{len(updates)} properties:")
         print(f"   CPU: {cpu_usage}% | RAM: {memory_percent}% ({memory_used_gb}GB) | "
-              f"Disk: {disk_percent}% ({disk_used_gb}GB) | Uptime: {uptime//3600}h")
+             f"Disk: {disk_percent}% ({disk_used_gb}GB) | Uptime: {uptime//3600}h")
         
         return success_count > 0
         
